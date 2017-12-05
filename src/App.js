@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import styles from './App.css'
+import ImageConfig from './components/ImageConfig'
 
 class App extends Component {
     render() {
@@ -8,6 +9,9 @@ class App extends Component {
                 <header className={styles.header}>
                     <h1 className={styles.title}>Welcome to Sat</h1>
                 </header>
+                <div className={styles.appContent}>
+                    <ImageConfig />
+                </div>
             </div>
         )
     }
