@@ -41,10 +41,6 @@ class ImageConfig extends Component {
         const { coordinates, src, title } = this.state
         return (
             <form>
-                {coordinates.length > 0 &&
-                    coordinates.map((coor, i) => 
-                        <div key={i}>{i + 1}: x - {coor.x}, y - {coor.y}</div>
-                    )}
                 <input type='text' placeholder='Floor Plan Title' onChange={this.changeTitle} />
                 <input type='file' onChange={this.displayFloorPlanImage} />
                 <div className={styles.floorPlanWrapper}>
@@ -53,9 +49,15 @@ class ImageConfig extends Component {
                         src={src}
                         alt=''
                         title={title}
-                        ref={img => {this.img = img}}
+                        ref={img => this.img = img}
                         onClick={this.getCoordinates}
                     />
+                    {coordinates.length > 0 &&
+                        <div className={styles.coordinates}>
+                            {coordinates.map((coor, i) => 
+                                <div key={i}>{i + 1}: x - {coor.x}, y - {coor.y}</div>
+                            )}
+                        </div>}
                 </div>
             </form>
         )
