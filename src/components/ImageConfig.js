@@ -7,22 +7,22 @@ class ImageConfig extends Component {
         this.displayFloorPlanImage = this.displayFloorPlanImage.bind(this)
         this.changeTitle = this.changeTitle.bind(this)
         this.getCoordinates = this.getCoordinates.bind(this)
-        this.floorPlanCoordinates = []
         this.defaultState = {
-            floorPlanSrc: null,
-            floorPlanTitle: 'Floor Plan Title',
+            src: null,
+            title: 'Floor Plan Title',
+            coordinates: []
         }
         this.state = this.defaultState
     }
 
     changeTitle (event) {
-        this.setState({floorPlanTitle: event.target.value})
+        this.setState({title: event.target.value})
     }
 
     displayFloorPlanImage (event) {
         if (event.target.files && event.target.files[0]) {
             var reader = new FileReader()
-            reader.onload = e => this.setState({floorPlanSrc: e.target.result})
+            reader.onload = e => this.setState({src: e.target.result})
             reader.readAsDataURL(event.target.files[0])
         }
     }
@@ -31,23 +31,28 @@ class ImageConfig extends Component {
         const floorPlan = this.img.getBoundingClientRect()
         const top = floorPlan.top + window.scrollY
         const left = floorPlan.left + window.scrollX
-        const floorPlanCoordinateY = (event.pageY - top) / floorPlan.height
-        const floorPlanCoordinateX = (event.pageX - left) / floorPlan.width
-        this.floorPlanCoordinates.push({top: floorPlanCoordinateY, left: floorPlanCoordinateX})
-        console.log(this.floorPlanCoordinates)
+        const coordinateY = (event.pageY - top) / floorPlan.height
+        const coordinateX = (event.pageX - left) / floorPlan.width
+        const newCoordinates = {y: coordinateY, x: coordinateX}
+        this.setState({coordinates: [...this.state.coordinates, newCoordinates]})
     }
 
     render () {
+        const { coordinates, src, title } = this.state
         return (
             <form>
+                {coordinates.length > 0 &&
+                    coordinates.map((coor, i) => 
+                        <div key={i}>{i + 1}: x - {coor.x}, y - {coor.y}</div>
+                    )}
                 <input type='text' placeholder='Floor Plan Title' onChange={this.changeTitle} />
                 <input type='file' onChange={this.displayFloorPlanImage} />
                 <div className={styles.floorPlanWrapper}>
                     <img
                         className={styles.floorPlan}
-                        src={this.state.floorPlanSrc}
+                        src={src}
                         alt=''
-                        title={this.state.floorPlanTitle}
+                        title={title}
                         ref={img => {this.img = img}}
                         onClick={this.getCoordinates}
                     />
