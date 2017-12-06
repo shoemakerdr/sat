@@ -15,7 +15,7 @@ class ImageConfig extends Component {
         this.defaultState = {
             src: null,
             title: 'Floor Plan Title',
-            coordinates: [],
+            coordinates: null,
             canGetCoordinate: false,
         }
         this.state = this.defaultState
@@ -54,7 +54,7 @@ class ImageConfig extends Component {
             const coordinateX = (event.pageX - left) / floorPlan.width
             const newCoordinates = {y: coordinateY, x: coordinateX}
             this.setState({
-                coordinates: [...this.state.coordinates, newCoordinates],
+                coordinates: newCoordinates,
                 canGetCoordinate: false,
             })
         }
@@ -95,11 +95,9 @@ class ImageConfig extends Component {
                             <input type='text' placeholder='Department' onChange={this.changeDepartment} />
                             <input type='text' placeholder='Details' onChange={this.changeDetails} />
                             <button type='button' onClick={this.allowGetCoordinate}>Set Coordinate</button>
-                            {coordinates.length > 0 &&
+                            {coordinates &&
                                 <div className={styles.coordinates}>
-                                    {coordinates.map((coor, i) => 
-                                        <div key={i}>{i + 1}: x - {coor.x}, y - {coor.y}</div>
-                                    )}
+                                    <div>x: {coordinates.x}, y: {coordinates.y}</div>
                                 </div>}
                         </div>}
                 </div>
