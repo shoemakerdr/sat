@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import styles from './App.css'
-import ImageConfig from './components/ImageConfig'
+import FloorPlanEditor from './components/FloorPlanEditor'
 
 class App extends Component {
     render() {
@@ -10,7 +10,7 @@ class App extends Component {
                     <h1 className={styles.title}>Welcome to Sat</h1>
                 </header>
                 <div className={styles.appContent}>
-                    <ImageConfig />
+                    <FloorPlanEditor />
                 </div>
             </div>
         )

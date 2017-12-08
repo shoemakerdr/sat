@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import styles from './styles/ImageConfig.css'
+import styles from './styles/FloorPlanEditor.css'
 
-class ImageConfig extends Component {
+class FloorPlanEditor extends Component {
     constructor () {
         super()
         this.displayFloorPlan = this.displayFloorPlan.bind(this)
@@ -115,4 +115,4 @@ class ImageConfig extends Component {
     }
 }
 
-export default ImageConfig
+export default FloorPlanEditor
