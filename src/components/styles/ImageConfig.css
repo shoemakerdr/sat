@@ -12,7 +12,23 @@
     height: 100%;
 }
 
+.flexRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.flexRowRight {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
 .coordinates {
     text-align: left;
     margin: 16px 0;
+}
+
+.crosshair {
+    cursor: crosshair;
 }
