@@ -17,6 +17,11 @@ class ImageConfig extends Component {
             title: 'Floor Plan Title',
             coordinates: null,
             canGetCoordinate: false,
+            types: [
+                {value:'desk', text: 'Desk'},
+                {value:'office', text: 'Office'},
+                {value:'conference-room', text: 'Conference Room'},
+            ],
         }
         this.state = this.defaultState
     }
@@ -61,14 +66,14 @@ class ImageConfig extends Component {
     }
 
     render () {
-        const { coordinates, src, title } = this.state
+        const { coordinates, src, title, canGetCoordinate, types } = this.state
         return (
             <form>
                 <input type='text' placeholder='Floor Plan Title' onChange={this.changeTitle} />
                 <input type='file' onChange={this.displayFloorPlan} />
                 <div className={styles.floorPlanWrapper}>
                     <img
-                        className={styles.floorPlan}
+                        className={canGetCoordinate ? `${styles.floorPlan} ${styles.crosshair}` : styles.floorPlan}
                         src={src}
                         alt=''
                         title={title}
@@ -76,21 +81,25 @@ class ImageConfig extends Component {
                         onClick={this.getCoordinates}
                     />
                     {src &&
-                        <div>
+                        <div className={styles.flexRight}>
                             <input type='text' placeholder='Name' onChange={this.changeName} />
-                            <div>
-                                <input type='radio' id='labelDesk'
-                                name='type' value='desk' />
-                                <label htmlFor='labelDesk'>Desk</label>
-
-                                <input type='radio' id='labelOffice'
-                                name='type' value='office' />
-                                <label htmlFor='labelOffice'>Office</label>
-
-                                <input type='radio' id='labelConferenceRoom'
-                                name='type' value='conference room' />
-                                <label htmlFor='labelConferenceRoom'>Conference Room</label>
-                            </div>
+                            {types.length > 0 &&
+                                <div>
+                                    {types.map((type, i) => {
+                                        const id = `type-${type.value}`
+                                        return (
+                                            <div className={styles.flexRowRight} key={i}>
+                                                <input
+                                                    type='radio'
+                                                    id={id}
+                                                    name='type'
+                                                    value={type.value}
+                                                />
+                                                <label htmlFor={id}>{type.text}</label>
+                                            </div>
+                                        )
+                                    })}
+                                </div>}
                             <input type='text' placeholder='Label' onChange={this.changeLabel} />
                             <input type='text' placeholder='Department' onChange={this.changeDepartment} />
                             <input type='text' placeholder='Details' onChange={this.changeDetails} />
