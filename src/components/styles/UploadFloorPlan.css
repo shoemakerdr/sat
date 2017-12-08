@@ -1,0 +1,15 @@
+
+.floorPlanWrapper {
+    height:80vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+
+.floorPlan {
+    margin: 16px 0;
+    max-height: 80vh;
+    height: 80%;
+}
