@@ -1,0 +1,18 @@
+
+.floorPlan {
+    width: 600px;
+    height: 400px;
+}
+
+.coordinate {
+    fill: gray;
+    transition: all .3s ease-in-out;
+}
+
+.coordinate:hover {
+    fill: blue;
+}
+
+.crosshair {
+    cursor: crosshair;
+}
