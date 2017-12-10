@@ -2,25 +2,13 @@ import React, { Component } from 'react'
 import styles from './styles/FloorPlanEditor.css'
 import floorPlanJpg from '../images/floor-plan.jpg'
 import ToolTip from './ToolTip'
-
-const svgStyle = plan => {
-    return {
-        width: plan.width + 'px',
-        height: plan.height + 'px',
-        background: `url(${plan.src})`,
-        backgroundSize: '100% auto',
-        backgroundRepeat: 'no-repeat',
-    }
-}
+import SvgMap from './SvgMap'
 
 class FloorPlanEditor extends Component {
     constructor () {
         super()
-        this.changeName = this.changeName.bind(this)
-        this.changeType = this.changeType.bind(this)
-        this.changeLabel = this.changeLabel.bind(this)
-        this.changeDepartment = this.changeDepartment.bind(this)
-        this.changeDetails = this.changeDetails.bind(this)
+        this.changeHandler = this.changeHandler.bind(this)
+        this.setSvgRef = this.setSvgRef.bind(this)
         this.allowGetCoordinate = this.allowGetCoordinate.bind(this)
         this.getCoordinates = this.getCoordinates.bind(this)
         this.addCoordinate = this.addCoordinate.bind(this)
@@ -30,8 +18,8 @@ class FloorPlanEditor extends Component {
         this.saveAll = this.saveAll.bind(this)
         this.defaultState = {
             floorPlan: {
-                width: 1200,
-                height: 800,
+                width: 600,
+                height: 400,
                 src: floorPlanJpg,
                 title: 'Floor Plan',
             },
@@ -63,53 +51,13 @@ class FloorPlanEditor extends Component {
         this.state = this.defaultState
     }
 
-    changeName (event) {
+    changeHandler (event) {
         this.setState({
             ...this.state,
             form: {
                 ...this.state.form,
-                name: event.target.value,
-                }
-        })
-    }
-
-    changeType (event) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                type: event.target.value,
-                }
-        })
-    }
-
-    changeLabel (event) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                label: event.target.value,
-                }
-        })
-    }
-
-    changeDepartment (event) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                department: event.target.value,
-                }
-        })
-    }
-
-    changeDetails (event) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                details: event.target.value,
-                }
+                [event.target.name]: event.target.value
+            }
         })
     }
 
@@ -117,9 +65,13 @@ class FloorPlanEditor extends Component {
         this.setState({canGetCoordinate: true})
     }
 
+    setSvgRef (svg) {
+        this.svg = svg
+    } 
+
     getCoordinates (event) {
         if (this.state.canGetCoordinate) {
-            const floorPlan = this.img.getBoundingClientRect()
+            const floorPlan = this.svg.getBoundingClientRect()
             const top = floorPlan.top + window.scrollY
             const left = floorPlan.left + window.scrollX
             const coordinateY = (event.pageY - top) / floorPlan.height
@@ -135,9 +87,9 @@ class FloorPlanEditor extends Component {
     }
 
     addCoordinate (event) {
-        const { toolTipInfo, possibleCoordinate } = this.state
+        const { form, possibleCoordinate } = this.state
         const newCoordinates =  this.state.coordinates.slice()
-        newCoordinates.push(JSON.parse(JSON.stringify({...toolTipInfo, position: {x: possibleCoordinate.x, y: possibleCoordinate.y}})))
+        newCoordinates.push(JSON.parse(JSON.stringify({...form, position: {x: possibleCoordinate.x, y: possibleCoordinate.y}})))
         this.setState({
             ...this.defaultState,
             coordinates: newCoordinates,
@@ -163,7 +115,6 @@ class FloorPlanEditor extends Component {
 
     showPossibleToolTip (event) {
         event.stopPropagation()
-        console.log('tool tip showing')
         const { form } = this.state
         this.setState({
             isToolTipVisible: true,
@@ -199,62 +150,39 @@ class FloorPlanEditor extends Component {
             form,
         } = this.state
         return (
-            <form onSubmit={this.saveAll}>
+            <div>
             {isToolTipVisible && <ToolTip isVisible={isToolTipVisible} info={toolTipInfo} />}
                 <div className={styles.floorPlanWrapper}>
-                    <svg
-                        style={svgStyle(floorPlan)}
-                        className={canGetCoordinate ? `${styles.floorPlan} ${styles.crosshair}` : styles.floorPlan}
-                        title={floorPlan.title}
-                        ref={img => this.img = img}
-                        onClick={this.getCoordinates}
-                    >
-                        {coordinates.length > 0 &&
-                            coordinates.map((coor,i) => {
-                                return (
-                                    <circle
-                                        key={i}
-                                        cx={floorPlan.width * coor.position.x}
-                                        cy={floorPlan.height * coor.position.y}
-                                        r='8'
-                                        fill='gray'
-                                        fillOpacity='0.5'
-                                        onMouseOver={this.showToolTip(i)}
-                                        onMouseOut={this.hideToolTip}
-                                    ></circle>
-                                )
-                            })}
-                        {possibleCoordinate && 
-                            <circle
-                                cx={floorPlan.width * possibleCoordinate.x}
-                                cy={floorPlan.height * possibleCoordinate.y}
-                                r='8'
-                                fill='red'
-                                fillOpacity='0.5'
-                                onMouseEnter={this.showPossibleToolTip}
-                                onMouseOut={this.hideToolTip}
-                            ></circle>}
-                    </svg>
+                    <SvgMap
+                        floorPlan={floorPlan}
+                        getCoordinates={this.getCoordinates}
+                        canGetCoordinate={canGetCoordinate}
+                        coordinates={coordinates}
+                        possibleCoordinate={possibleCoordinate}
+                        showToolTip={this.showToolTip}
+                        setSvgRef={this.setSvgRef}
+                        showPossibleToolTip={this.showPossibleToolTip}
+                        hideToolTip={this.hideToolTip}
+                    />
                     {floorPlan.src &&
                         <div className={styles.flexRight}>
                             {types.length > 0 &&
-                                <select value={form.type} onChange={this.changeType}>
+                                <select name='type' value={form.type} onChange={this.changeHandler}>
                                     <option value='Select a type' disabled>Select a type</option>
                                     {types.map((type, i) => {
-                                        const id = `type-${type.value}`
-                                        return <option key={i} id={id} value={type.text}>{type.text}</option>
+                                        return <option key={i} value={type.text}>{type.text}</option>
                                     })}
                                 </select>}
-                            <input type='text' placeholder='Name' onChange={this.changeName} value={form.name} />
-                            <input type='text' placeholder='Label' onChange={this.changeLabel} value={form.label} />
-                            <input type='text' placeholder='Department' onChange={this.changeDepartment} value={form.department} />
-                            <input type='text' placeholder='Details' onChange={this.changeDetails} value={form.details} />
+                            <input name='name' type='text' placeholder='Name' onChange={this.changeHandler} value={form.name} />
+                            <input name='label' type='text' placeholder='Label' onChange={this.changeHandler} value={form.label} />
+                            <input name='department' type='text' placeholder='Department' onChange={this.changeHandler} value={form.department} />
+                            <input name='details' type='text' placeholder='Details' onChange={this.changeHandler} value={form.details} />
                             <button type='button' onClick={this.allowGetCoordinate}>{canGetCoordinate ? 'Click Map To Set': 'Set Position'}</button>
                             <button type='button' onClick={this.addCoordinate}>Save Coordinate</button>
                         </div>}
                 </div>
-                <input type='submit' value='Save' />
-            </form>
+                <button onClick={this.saveAll}>Save</button>
+            </div>
         )
     }
 }
