@@ -1,0 +1,16 @@
+
+.toolTip {
+    position: absolute;
+}
+
+.visible {
+    display: flex;
+    flex-direction: column;
+    background: #DDD;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.hidden {
+    display: none;
+}
