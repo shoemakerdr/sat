@@ -1,17 +1,16 @@
 
 .floorPlanWrapper {
-    height:80vh;
-    width: 100vw;
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
     align-content: center;
     align-items: center;
+    padding: 16px 0;
 }
 
 .floorPlan {
-    margin: 16px 0;
-    max-height: 80vh;
-    height: 80%;
+    width: 600px;
+    height: 800px;
 }
 
 .flexRight {
@@ -33,4 +32,13 @@
 
 .crosshair {
     cursor: crosshair;
+}
+
+@media screen and (min-width: 550px) {
+    .floorPlanWrapper {
+        flex-direction: row;
+        justify-content: space-around;
+        align-content: center;
+        align-items: center;
+    }
 }
