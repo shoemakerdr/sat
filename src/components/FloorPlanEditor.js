@@ -88,11 +88,16 @@ class FloorPlanEditor extends Component {
 
     addCoordinate (event) {
         const { form, possibleCoordinate } = this.state
-        const newCoordinates =  this.state.coordinates.slice()
-        newCoordinates.push(JSON.parse(JSON.stringify({...form, position: {x: possibleCoordinate.x, y: possibleCoordinate.y}})))
+        const newCoordinates = JSON.parse(JSON.stringify({
+            ...form,
+            position: {
+                x: possibleCoordinate.x,
+                y: possibleCoordinate.y
+            },
+        }))
         this.setState({
             ...this.defaultState,
-            coordinates: newCoordinates,
+            coordinates: [...this.state.coordinates, newCoordinates]
         })
     }
 
