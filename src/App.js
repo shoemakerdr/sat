@@ -15,7 +15,7 @@ class App extends Component {
                     </div>
                     <div className={styles.searchWrapper}>
                         <img src={searchIcon} alt='search icon' className={styles.searchIcon} />
-                        <input type='text' className={styles.searchBox} />
+                        <input type='text' className={styles.searchInput} />
                     </div>
                 </header>
                 <div className={styles.appContent}>
