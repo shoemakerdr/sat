@@ -4,15 +4,44 @@
 }
 
 .header {
-    background-color: #222;
-    padding: 10px;
-    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: black;
+}
+
+.titleWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .title {
-    font-size: 1.5em;
+    margin: 8px 16px;
+    font-size: 48px;
+}
+
+.chair {
+    width: 36px;
+    margin-left: -16px;
+    margin-top: -4px;
+    height: auto;
 }
 
 .appContent {
     margin: 16px 0;
+}
+
+.searchWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 16px;
+}
+
+.searchIcon {
+    margin: 0 8px;
+    width: 20px;
+    height: 20px;
 }
