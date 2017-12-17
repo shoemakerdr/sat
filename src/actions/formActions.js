@@ -6,7 +6,7 @@ const CHANGE_LABEL = 'CHANGE_LABEL'
 const CHANGE_DEPARTMENT = 'CHANGE_DEPARTMENT'
 const CHANGE_DETAILS = 'CHANGE_DETAILS'
 const SET_POINT = 'SET_POINT'
-const SAVE_COORDINATE = 'SAVE_COORDINATE'
+const CLEAR_FORM = 'CLEAR_FORM'
 
 
 // -- ACTION CREATORS -- \\
@@ -28,6 +28,6 @@ export const changeDetails = details => {
 export const setPoint = point => {
     return { type: SET_POINT, point }
 }
-export const saveCoordinate = () => {
-    return { type: SAVE_COORDINATE }
+export const clearForm = () => {
+    return { type: CLEAR_FORM }
 }
