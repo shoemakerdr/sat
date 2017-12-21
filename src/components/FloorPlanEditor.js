@@ -67,7 +67,7 @@ class FloorPlanEditor extends Component {
 
     setSvgRef (svg) {
         this.svg = svg
-    } 
+    }
 
     getCoordinates (event) {
         if (this.state.canGetCoordinate) {
@@ -172,18 +172,56 @@ class FloorPlanEditor extends Component {
                     {floorPlan.src &&
                         <div className={styles.flexRight}>
                             {types.length > 0 &&
-                                <select name='type' value={form.type} onChange={this.changeHandler}>
+                                <select
+                                    name='type'
+                                    value={form.type}
+                                    onChange={this.changeHandler
+                                >
                                     <option value='Select a type' disabled>Select a type</option>
                                     {types.map((type, i) => {
                                         return <option key={i} value={type.text}>{type.text}</option>
                                     })}
                                 </select>}
-                            <input name='name' type='text' placeholder='Name' onChange={this.changeHandler} value={form.name} />
-                            <input name='label' type='text' placeholder='Label' onChange={this.changeHandler} value={form.label} />
-                            <input name='department' type='text' placeholder='Department' onChange={this.changeHandler} value={form.department} />
-                            <input name='details' type='text' placeholder='Details' onChange={this.changeHandler} value={form.details} />
-                            <button type='button' onClick={this.allowGetCoordinate}>{canGetCoordinate ? 'Click Map To Set': 'Set Position'}</button>
-                            <button type='button' onClick={this.addCoordinate}>Save Coordinate</button>
+                                <input
+                                  name='name'
+                                  type='text'
+                                  placeholder='Name'
+                                  onChange={this.changeHandler}
+                                  value={form.name}
+                                />
+                                <input
+                                  name='label'
+                                  type='text'
+                                  placeholder='Label'
+                                  onChange={this.changeHandler}
+                                  value={form.label}
+                                />
+                            <input
+                              name='department'
+                              type='text'
+                              placeholder='Department'
+                              onChange={this.changeHandler}
+                              value={form.department}
+                            />
+                            <input
+                              name='details'
+                              type='text'
+                              placeholder='Details'
+                              onChange={this.changeHandler}
+                              value={form.details}
+                            />
+                            <button
+                              type='button'
+                              onClick={this.allowGetCoordinate}
+                            >
+                              {canGetCoordinate ? 'Click Map To Set': 'Set Position'}
+                            </button>
+                            <button
+                              type='button'
+                              onClick={this.addCoordinate}
+                            >
+                              Save Coordinate
+                            </button>
                         </div>}
                 </div>
                 <button onClick={this.saveAll}>Save</button>
