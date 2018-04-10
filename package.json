@@ -5,8 +5,8 @@
   "main": "dev-elm.js",
   "scripts": {
     "elm": "node_modules/elm-live/bin/elm-live.js src/Main.elm --output=dev-elm.js --open",
-    "make": "elm-make src/Main.elm --output=dev-elm.js && npm run update-js",
-    "build": "node_modules/webpack/bin/webpack.js",
+    "make": "elm-make src/Main.elm --output=dev-elm.js",
+    "build": "npm run make && node_modules/webpack/bin/webpack.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
