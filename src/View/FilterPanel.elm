@@ -1,10 +1,11 @@
 module View.FilterPanel exposing (Model, Msg, initialModel, update, view)
 
 import Data.Filter as Filter exposing (Filter)
+import Data.Id as Id exposing (Id)
+import Data.Location as Location exposing (Location)
 import Html exposing (Html, div, h1, text, input, select, option, button, p)
 import Html.Attributes exposing (class, placeholder, value, selected)
 import Html.Events exposing (onInput, onClick)
-import Data.Location as Location exposing (Location)
 import Util exposing (onChange)
 import View.Options as Options
 
@@ -16,12 +17,14 @@ type alias Model =
     { filters : List (Filter FilterType Location)
     , nameInput : String
     , typeSelect : String
+    , individualSelected : Maybe Location
     }
 
 
 type FilterType
     = Name
     | Type
+    | Individual
     | IsTrashed
 
 
@@ -30,12 +33,18 @@ initialModel =
     { filters = [ isTrashedFilter ]
     , nameInput = ""
     , typeSelect = Location.noSelection
+    , individualSelected = Nothing
     }
 
 
 isTrashedFilter : Filter FilterType Location
 isTrashedFilter =
     (Filter.new IsTrashed (not << .is_trashed))
+
+
+alwaysTrue : Location -> Bool
+alwaysTrue _ =
+    True
 
 
 
@@ -46,6 +55,8 @@ type Msg
     = NameInputChange String
     | TypeSelectChange String
     | ResetFilterForm
+    | ChooseIndividual Location
+    | ClearIndividual
 
 
 type FilterMsg
@@ -87,6 +98,18 @@ update msg model =
         ResetFilterForm ->
             initialModel
 
+        ChooseIndividual location ->
+            updateFilter
+                Merge
+                (Filter.new Individual <| Location.equal location)
+                { model | individualSelected = Just location }
+
+        ClearIndividual ->
+            updateFilter
+                Remove
+                (Filter.new Individual <| alwaysTrue)
+                { model | individualSelected = Nothing }
+
 
 updateFilter : FilterMsg -> Filter FilterType Location -> Model -> Model
 updateFilter filterMsg filter model =
@@ -127,24 +150,40 @@ view locations model =
     in
         div [ class "location-filter-wrapper" ]
             [ h1 [ class "location-title" ] [ text "Locations" ]
-            , viewForm model.nameInput model.typeSelect
+            , viewForm model
             , div [ class "location-list" ] <| locationInfoList filteredLocations
             ]
 
 
-viewForm : String -> String -> Html Msg
-viewForm nameInput typeSelected =
+viewForm : Model -> Html Msg
+viewForm { nameInput, typeSelect, individualSelected } =
     div []
-        [ input
-            [ class "form-name-input"
-            , placeholder "Filter by name"
-            , value nameInput
-            , onInput NameInputChange
+        [ div []
+            [ input
+                [ class "form-name-input"
+                , placeholder "Filter by name"
+                , value nameInput
+                , onInput NameInputChange
+                ]
+                []
+            , select [ class "form-select-type", onChange TypeSelectChange ] <| Options.view typeSelect True
+            , button [ onClick ResetFilterForm ] [ text "Reset filter" ]
             ]
-            []
-        , select [ class "form-select-type", onChange TypeSelectChange ] <| Options.view typeSelected True
-        , button [ onClick ResetFilterForm ] [ text "Reset filter" ]
+        , viewIndividualInfo individualSelected
         ]
+
+
+viewIndividualInfo : Maybe Location -> Html Msg
+viewIndividualInfo individual =
+    case individual of
+        Nothing ->
+            div [] []
+
+        Just location ->
+            div [ class "individual-selection" ]
+                [ p [ class "individual-selection-text" ] [ text location.name ]
+                , button [ onClick ClearIndividual ] [ text "Remove Selected" ]
+                ]
 
 
 locationInfoList : List Location -> List (Html Msg)
@@ -165,5 +204,5 @@ locationInfoList locations =
                         else
                             ", ext. " ++ extension
                 in
-                    p [ class "location-list-info" ] [ text <| location.name ++ " - " ++ locationType ++ extString ]
+                    p [ class "location-list-info", onClick <| ChooseIndividual location ] [ text <| location.name ++ " - " ++ locationType ++ extString ]
             )
