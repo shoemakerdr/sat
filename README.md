@@ -1,1 +1,0 @@
-Have trouble locating the conference room for your next meeting or where your coworkers sit? That's where Sat comes in.
