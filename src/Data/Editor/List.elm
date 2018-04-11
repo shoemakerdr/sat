@@ -12,7 +12,7 @@ module Data.Editor.List
         , delete
         , newWithDefault
         , isActive
-        , isSaved
+        , isNew
         )
 
 import List.Extra as Extra
@@ -104,8 +104,8 @@ isActive (Editor current _) =
             (Debug.log "isActive" True)
 
 
-isSaved : (a -> a -> Bool) -> Editor a -> Bool
-isSaved equality (Editor current list) =
+isNew : (a -> a -> Bool) -> Editor a -> Bool
+isNew equality (Editor current list) =
     case current of
         Nothing ->
             False
