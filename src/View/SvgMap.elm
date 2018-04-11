@@ -84,14 +84,14 @@ plotLocations events dimensions model =
                     LEditor.current model.locationEditor
                         |> Maybe.map
                             (\location ->
-                                [ viewCircle events "#FF0000" "editing-location-point" model.mode dimensions location ]
+                                [ viewCircle events "#25f508" "editing-location-point" model.mode dimensions location ]
                             )
                         |> Maybe.withDefault []
     in
         locations
             |> List.map
                 (\location ->
-                    viewCircle events "#72acdc" "location-point" model.mode dimensions location
+                    viewCircle events "#FF0000" "location-point" model.mode dimensions location
                 )
             |> (++) current
 
@@ -102,7 +102,7 @@ viewCircle events color className mode dimensions location =
         ([ SvgAttr.class className
          , cx (toString <| location.position_x * dimensions.width)
          , cy (toString <| location.position_y * dimensions.height)
-         , r "8"
+         , r "6"
          , fill color
          , fillOpacity "0.5"
          ]
