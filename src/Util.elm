@@ -4,6 +4,7 @@ module Util
         , onChange
         , onClickWithPosition
         , (@)
+        , sortByName
         )
 
 import Json.Decode as Json exposing (Decoder)
@@ -43,3 +44,12 @@ positionDecoder =
 (@) message a =
     Debug.log message a
 infixr 0 @
+
+
+type alias Named a =
+    { a | name : String }
+
+
+sortByName : List (Named a) -> List (Named a)
+sortByName =
+    List.sortBy (String.toLower << .name)
