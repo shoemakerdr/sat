@@ -78,6 +78,7 @@ init flags =
         , mode = View
         , locationEditor = LEditor.editor locations
         , floorplanEditor = SEditor.editor flags.floorplan.name
+        , showFilterPanel = True
         , errorStatus = Nothing
         }
             ! [ Task.perform ResizeFloorplan Window.size ]
@@ -100,6 +101,7 @@ type alias Model =
     , mode : Mode
     , locationEditor : LEditor.Editor Location
     , floorplanEditor : SEditor.Editor
+    , showFilterPanel : Bool
     , errorStatus : Maybe Http.Error
     }
 
@@ -112,6 +114,8 @@ type Msg
     = NoOp
     | HandleHttpData (Result Http.Error FloorPlanDataPair)
     | RetryRequest
+    | HideFilterPanel
+    | ShowFilterPanel
     | FilterPanelMsg FilterPanel.Msg
     | ShowLocationInfo Location
     | ShowToolTip (Maybe Position)
@@ -155,6 +159,12 @@ update msg model =
                     model
             in
                 model ! [ Request.saveDataPair domain token floorplan locations HandleHttpData ]
+
+        HideFilterPanel ->
+            { model | showFilterPanel = False } ! []
+
+        ShowFilterPanel ->
+            { model | showFilterPanel = True } ! []
 
         FilterPanelMsg panelMsg ->
             let
@@ -543,23 +553,41 @@ view model =
                         Edit _ ->
                             viewEditToolTip location
 
+        filterPanelButton =
+            if model.showFilterPanel then
+                [ button [ onClick HideFilterPanel ] [ text "Hide Filter Panel" ] ]
+            else
+                [ button [ onClick ShowFilterPanel ] [ text "Show Filter Panel" ] ]
+
+        panelButtons =
+            if model.isOwner then
+                div [ class "button-panel" ] <|
+                    filterPanelButton
+                        ++ viewEditorButtons model
+            else
+                div [ class "button-panel" ] filterPanelButton
+
+        filterPanel =
+            if model.showFilterPanel then
+                [ FilterPanel.view (LEditor.list model.locationEditor) model.filterPanel
+                    |> Html.map FilterPanelMsg
+                ]
+            else
+                []
+
         config =
             TT.config 10 10 "tooltip-wrapper" []
     in
         div []
             [ Error.view errorEvents model
             , editableFloorPlanName model
-            , div [] <|
-                if model.isOwner then
-                    viewEditorPanel model
-                else
-                    []
+            , panelButtons
             , div
                 [ class "floorplan-main-content" ]
-                [ FilterPanel.view (LEditor.list model.locationEditor) model.filterPanel
-                    |> Html.map FilterPanelMsg
-                , SvgMap.view (svgMapEvents model.mode) model
-                ]
+              <|
+                filterPanel
+                    ++ [ SvgMap.view (svgMapEvents model.mode) model
+                       ]
             , TT.view config (toolTipView) model.toolTip
             ]
 
@@ -581,22 +609,16 @@ editableFloorPlanName model =
                 [ text model.floorplan.name ]
 
 
-viewEditorPanel : Model -> List (Html Msg)
-viewEditorPanel { mode } =
+viewEditorButtons : Model -> List (Html Msg)
+viewEditorButtons { mode } =
     case mode of
         View ->
-            [ div [ class "editor-panel" ]
-                [ button [ onClick BeginEdit ] [ text "Edit Floor Plan" ]
-                , div [] []
-                ]
+            [ button [ onClick BeginEdit ] [ text "Edit Floor Plan" ]
             ]
 
         Edit _ ->
-            [ div [ class "editor-panel" ]
-                [ button [ onClick SaveEdit ] [ text "Save Changes" ]
-                , button [ onClick CancelEdit ] [ text "Cancel" ]
-                , div [] []
-                ]
+            [ button [ onClick SaveEdit ] [ text "Save Changes" ]
+            , button [ onClick CancelEdit ] [ text "Cancel" ]
             ]
 
 
