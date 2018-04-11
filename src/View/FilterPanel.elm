@@ -1,7 +1,6 @@
 module View.FilterPanel exposing (Model, Msg, initialModel, update, view)
 
 import Data.Filter as Filter exposing (Filter)
-import Data.Id as Id exposing (Id)
 import Data.Location as Location exposing (Location)
 import Html exposing (Html, div, h1, text, input, select, option, button, p)
 import Html.Attributes exposing (class, placeholder, value, selected)
@@ -40,11 +39,6 @@ initialModel =
 isTrashedFilter : Filter FilterType Location
 isTrashedFilter =
     (Filter.new IsTrashed (not << .is_trashed))
-
-
-alwaysTrue : Location -> Bool
-alwaysTrue _ =
-    True
 
 
 
@@ -107,7 +101,8 @@ update msg model =
         ClearIndividual ->
             updateFilter
                 Remove
-                (Filter.new Individual <| alwaysTrue)
+                -- For `(\_ -> True)` need some predicate to satisfy type
+                (Filter.new Individual <| (\_ -> True))
                 { model | individualSelected = Nothing }
 
 
