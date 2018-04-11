@@ -38,6 +38,7 @@ main =
 type alias Flags =
     { token : String
     , user : String
+    , domain : String
     , floorplan :
         { id : Int
         , aspect_ratio : Float
@@ -72,6 +73,7 @@ init flags =
         , floorplanDimensions = Nothing
         , token = flags.token
         , user = flags.user
+        , domain = flags.domain
         , isOwner = flags.user == flags.floorplan.owner_name
         , mode = View
         , locationEditor = LEditor.editor locations
@@ -93,6 +95,7 @@ type alias Model =
     , floorplanDimensions : Maybe Dimensions
     , token : String
     , user : String
+    , domain : String
     , isOwner : Bool
     , mode : Mode
     , locationEditor : LEditor.Editor Location
@@ -148,10 +151,10 @@ update msg model =
 
         RetryRequest ->
             let
-                { token, floorplan, locations } =
+                { domain, token, floorplan, locations } =
                     model
             in
-                model ! [ Request.saveDataPair token floorplan locations HandleHttpData ]
+                model ! [ Request.saveDataPair domain token floorplan locations HandleHttpData ]
 
         FilterPanelMsg panelMsg ->
             let
@@ -217,7 +220,7 @@ update msg model =
                 newLocations =
                     LEditor.list model.locationEditor
 
-                { floorplan } =
+                { domain, token, floorplan } =
                     model
 
                 newFloorplan =
@@ -230,7 +233,7 @@ update msg model =
                     , mode = View
                     , locationEditor = LEditor.editor newLocations
                 }
-                    ! [ Request.saveDataPair model.token newFloorplan newLocations HandleHttpData ]
+                    ! [ Request.saveDataPair domain token newFloorplan newLocations HandleHttpData ]
 
         EditFloorPlanName ->
             { model | mode = Edit FloorPlanName } ! []

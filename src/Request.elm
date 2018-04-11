@@ -21,6 +21,10 @@ import Time
 import Util exposing ((@))
 
 
+type alias Domain =
+    String
+
+
 type alias Token =
     String
 
@@ -29,9 +33,9 @@ type alias DataPairHandler msg =
     Result Http.Error FloorPlanDataPair -> msg
 
 
-saveDataPair : Token -> FloorPlan -> List Location -> DataPairHandler msg -> Cmd msg
-saveDataPair token floorplan locations handler =
-    HttpBuilder.post (createApiUrl floorplan.id)
+saveDataPair : Domain -> Token -> FloorPlan -> List Location -> DataPairHandler msg -> Cmd msg
+saveDataPair domain token floorplan locations handler =
+    HttpBuilder.post (createApiUrl domain floorplan.id)
         |> withHeader "X-CSRFToken" token
         |> withJsonBody (encodeFloorplan floorplan locations)
         |> withTimeout (10 * Time.second)
@@ -40,6 +44,6 @@ saveDataPair token floorplan locations handler =
         |> HttpBuilder.send handler
 
 
-createApiUrl : Int -> String
-createApiUrl id =
-    "http://localhost:8000/api/floorplans/" ++ (toString id) ++ "/"
+createApiUrl : Domain -> Int -> String
+createApiUrl domain id =
+    domain ++ "/api/floorplans/" ++ (toString id) ++ "/"

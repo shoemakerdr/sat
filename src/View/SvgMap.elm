@@ -14,7 +14,7 @@ import Util exposing ((=>))
 import View.FilterPanel as FilterPanel
 
 
-type alias Events msg =
+type alias Config msg =
     { mapEvents : List (Attribute msg)
     , locationEvents : Location -> List (Attribute msg)
     }
@@ -27,10 +27,11 @@ type alias Model m =
         , mode : Mode
         , locationEditor : LEditor.Editor Location
         , filterPanel : FilterPanel.Model
+        , domain : String
     }
 
 
-view : Events msg -> Model m -> Html msg
+view : Config msg -> Model m -> Html msg
 view { mapEvents, locationEvents } model =
     case model.floorplanDimensions of
         Nothing ->
@@ -43,7 +44,7 @@ view { mapEvents, locationEvents } model =
                      , width <| toString dims.width
                      , height <| toString dims.height
                      , style
-                        [ "background" => ("url(" ++ "http://localhost:8000" ++ model.floorplan.image ++ ")")
+                        [ "background" => ("url(" ++ model.domain ++ model.floorplan.image ++ ")")
                         , "backgroundSize" => "100% auto"
                         , "backgroundRepeat" => "no-repeat"
                         ]
