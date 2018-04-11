@@ -16,7 +16,7 @@ import Keyboard
 import Mouse exposing (Position)
 import Request
 import Task
-import Util exposing ((=>), onChange, onClickWithPosition, (@))
+import Util exposing ((=>), onChange, onClickWithPosition, (@), sortByName)
 import View.Error as Error
 import View.FilterPanel as FilterPanel
 import View.Options as Options
@@ -60,7 +60,7 @@ init flags =
         locations =
             case Location.decodeLocations flags.floorplan.locations of
                 Ok l ->
-                    l
+                    sortByName l
 
                 -- TODO: Handle this error case
                 Err _ ->
@@ -201,7 +201,7 @@ update msg model =
                 ! []
 
         ResizeFloorplan size ->
-            { model | floorplanDimensions = Just <| Dimensions.get 0.7 size model.floorplan.aspect_ratio } ! []
+            { model | floorplanDimensions = Just <| Dimensions.get 0.9 size model.floorplan.aspect_ratio } ! []
 
         BeginEdit ->
             { model | mode = Edit Waiting } ! []
@@ -218,7 +218,8 @@ update msg model =
         SaveEdit ->
             let
                 newLocations =
-                    LEditor.list model.locationEditor
+                    sortByName <|
+                        LEditor.list model.locationEditor
 
                 { domain, token, floorplan } =
                     model
@@ -441,14 +442,22 @@ validateLocationOnSave model =
             if Location.isValid c then
                 let
                     newEditor =
-                        if LEditor.isSaved Location.equal model.locationEditor then
+                        if LEditor.isNew Location.equal model.locationEditor then
                             LEditor.create model.locationEditor
                         else
-                            LEditor.newWithDefault (\c -> LEditor.update (Location.equal c)) model.locationEditor
+                            LEditor.newWithDefault
+                                (\c -> LEditor.update (Location.equal c))
+                                model.locationEditor
+
+                    editor =
+                        newEditor
+                            |> LEditor.list
+                            |> sortByName
+                            |> LEditor.editor
                 in
                     { model
                         | toolTip = Hidden Nothing
-                        , locationEditor = newEditor
+                        , locationEditor = editor
                         , mode = Edit Waiting
                     }
                         ! []
@@ -462,8 +471,8 @@ updateWithData data model =
         Ok ( floorplan, locations ) ->
             { model
                 | floorplan = floorplan
-                , locations = locations
-                , locationEditor = LEditor.editor locations
+                , locations = sortByName locations
+                , locationEditor = LEditor.editor <| sortByName locations
                 , floorplanEditor = SEditor.editor floorplan.name
                 , errorStatus = Nothing
             }
