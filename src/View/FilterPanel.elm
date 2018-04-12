@@ -176,7 +176,14 @@ viewIndividualInfo individual =
 
         Just location ->
             div [ class "individual-selection" ]
-                [ p [ class "individual-selection-text" ] [ text location.name ]
+                [ p
+                    [ class "individual-selection-text" ]
+                    [ location.extension
+                        |> Maybe.map (\ext -> " - ext. " ++ (toString ext))
+                        |> Maybe.withDefault ""
+                        |> (++) location.name
+                        |> text
+                    ]
                 , button [ onClick ClearIndividual ] [ text "Remove Selected" ]
                 ]
 
