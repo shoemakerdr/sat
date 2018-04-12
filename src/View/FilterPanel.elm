@@ -2,8 +2,8 @@ module View.FilterPanel exposing (Model, Msg, initialModel, update, view)
 
 import Data.Filter as Filter exposing (Filter)
 import Data.Location as Location exposing (Location)
-import Html exposing (Html, div, h1, text, input, select, option, button, p)
-import Html.Attributes exposing (class, placeholder, value, selected)
+import Html exposing (Html, div, h1, text, input, select, option, button, p, span)
+import Html.Attributes exposing (class, placeholder, value, selected, tabindex)
 import Html.Events exposing (onInput, onClick)
 import Util exposing (onChange)
 import View.Options as Options
@@ -49,8 +49,7 @@ type Msg
     = NameInputChange String
     | TypeSelectChange String
     | ResetFilterForm
-    | ChooseIndividual Location
-    | ClearIndividual
+    | ToggleIndividual Location
 
 
 type FilterMsg
@@ -92,18 +91,20 @@ update msg model =
         ResetFilterForm ->
             initialModel
 
-        ChooseIndividual location ->
-            updateFilter
-                Merge
-                (Filter.new Individual <| Location.equal location)
-                { model | individualSelected = Just location }
+        ToggleIndividual location ->
+            case model.individualSelected of
+                Nothing ->
+                    updateFilter
+                        Merge
+                        (Filter.new Individual <| Location.equal location)
+                        { model | individualSelected = Just location }
 
-        ClearIndividual ->
-            updateFilter
-                Remove
-                -- For `(\_ -> True)` need some predicate to satisfy type
-                (Filter.new Individual <| (\_ -> True))
-                { model | individualSelected = Nothing }
+                Just _ ->
+                    updateFilter
+                        Remove
+                        -- For `(\_ -> True)` need some predicate to satisfy type
+                        (Filter.new Individual <| (\_ -> True))
+                        { model | individualSelected = Nothing }
 
 
 updateFilter : FilterMsg -> Filter FilterType Location -> Model -> Model
@@ -146,50 +147,27 @@ view locations model =
         div [ class "location-filter-wrapper" ]
             [ h1 [ class "location-title" ] [ text "Locations" ]
             , viewForm model
-            , div [ class "location-list" ] <| locationInfoList filteredLocations
+            , div [ class "location-list" ] <| locationInfoList filteredLocations model
             ]
 
 
 viewForm : Model -> Html Msg
 viewForm { nameInput, typeSelect, individualSelected } =
     div []
-        [ div []
-            [ input
-                [ class "form-name-input"
-                , placeholder "Filter by name"
-                , value nameInput
-                , onInput NameInputChange
-                ]
-                []
-            , select [ class "form-select-type", onChange TypeSelectChange ] <| Options.view typeSelect True
-            , button [ onClick ResetFilterForm ] [ text "Reset filter" ]
+        [ input
+            [ class "form-name-input"
+            , placeholder "Filter by name"
+            , value nameInput
+            , onInput NameInputChange
             ]
-        , viewIndividualInfo individualSelected
+            []
+        , select [ class "form-select-type", onChange TypeSelectChange ] <| Options.view typeSelect True
+        , button [ onClick ResetFilterForm ] [ text "Reset filter" ]
         ]
 
 
-viewIndividualInfo : Maybe Location -> Html Msg
-viewIndividualInfo individual =
-    case individual of
-        Nothing ->
-            div [] []
-
-        Just location ->
-            div [ class "individual-selection" ]
-                [ p
-                    [ class "individual-selection-text" ]
-                    [ location.extension
-                        |> Maybe.map (\ext -> " - ext. " ++ (toString ext))
-                        |> Maybe.withDefault ""
-                        |> (++) location.name
-                        |> text
-                    ]
-                , button [ onClick ClearIndividual ] [ text "Remove Selected" ]
-                ]
-
-
-locationInfoList : List Location -> List (Html Msg)
-locationInfoList locations =
+locationInfoList : List Location -> Model -> List (Html Msg)
+locationInfoList locations model =
     locations
         |> List.map
             (\location ->
@@ -206,5 +184,17 @@ locationInfoList locations =
                         else
                             ", ext. " ++ extension
                 in
-                    p [ class "location-list-info", onClick <| ChooseIndividual location ] [ text <| location.name ++ " - " ++ locationType ++ extString ]
+                    p
+                        [ class "location-list-info"
+                        , tabindex 0
+                        , onClick <| ToggleIndividual location
+                        ]
+                        [ text <| location.name ++ " - " ++ locationType ++ extString
+                        , span [ class "deselect" ]
+                            [ model.individualSelected
+                                |> Maybe.map (\_ -> "Click to deselect")
+                                |> Maybe.withDefault ""
+                                |> text
+                            ]
+                        ]
             )
