@@ -211,7 +211,7 @@ update msg model =
                 ! []
 
         ResizeFloorplan size ->
-            { model | floorplanDimensions = Just <| Dimensions.get 0.9 size model.floorplan.aspect_ratio } ! []
+            { model | floorplanDimensions = Just <| Dimensions.get 0.95 size model.floorplan.aspect_ratio } ! []
 
         BeginEdit ->
             { model | mode = Edit Waiting } ! []
